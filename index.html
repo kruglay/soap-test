@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>SOAP Client</title>
+	<script>
+		function sendSOAPRequest() {
+			// Get the input values
+			const xValue = document.getElementById('xValue').value;
+			const yValue = document.getElementById('yValue').value;
+
+		// 	// Create the SOAP request
+		// 	const soapRequest =
+		// 		`<?xml version="1.0"?>
+    // <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    //                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    //                xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    //   <soap:Body>
+    //     <Multiply xmlns="http://www.example.org/multiplication/">
+    //       <x>${xValue}</x>
+    //       <y>${yValue}</y>
+    //     </Multiply>
+    //   </soap:Body>
+    // </soap:Envelope>`;
+
+			const sr = `
+			<?xml version="1.0" encoding="utf-8"?>
+			<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xmlns:tns="http://www.example.org/multiplication/">
+				<soap:Body>
+					<tns:multiplyRequest>
+						<x>${xValue}</x>
+						<y>${yValue}</y>
+					</tns:multiplyRequest>
+				</soap:Body>
+			</soap:Envelope>`;
+
+			// Send the SOAP request
+			const xhr = new XMLHttpRequest();
+			xhr.open('POST', 'http://localhost:3000/multiply', true); // Change '/multiply' to your SOAP service's URL
+			xhr.setRequestHeader('Content-Type', 'text/xml');
+			xhr.setRequestHeader('SOAPAction', 'http://www.example.org/multiplication/multiply');
+			xhr.onreadystatechange = function () {
+				if (xhr.readyState === 4) {
+					if (xhr.status === 200) {
+						console.log(xhr.responseText);
+						// Process the response
+						alert('Success: ' + xhr.responseText);
+					} else {
+						console.error(xhr.statusText);
+					}
+				}
+			};
+			// xhr.send(soapRequest);
+			xhr.send(sr);
+			return false; // Prevent page refresh
+		}
+	</script>
+</head>
+<body>
+
+<h1>SOAP Web Service Client</h1>
+
+<form onsubmit="return sendSOAPRequest();">
+	<label for="xValue">X Value:</label>
+	<input type="text" id="xValue" name="xValue" required>
+	<label for="yValue">Y Value:</label>
+	<input type="text" id="yValue" name="yValue" required>
+	<input type="submit" value="Multiply">
+</form>
+
+</body>
+</html>
